@@ -22,9 +22,11 @@
 **Точность классификатора равна 62%**
 
 **AUROC составил 61%**
+
 ![alt text](/assets/auroc.png)
 
 **Матрица ошибок**
+
 ![alt text](/assets/confusion_matrix.png)
 
 ## Развитие проекта
