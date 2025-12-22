@@ -7,17 +7,19 @@ from catboost import CatBoostClassifier, Pool
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
-_MODEL_NAMES = [
-    "xgb",
-    "lightgbm",
-    "tabpfn",
-    "catboost",
-    "logreg",
-    "srf", 
-    "sgb"
-]
 
-def build_model(name: Literal[*_MODEL_NAMES], params: Dict) -> object:
+_MODEL_CONSTRUCTORS = {
+    "xgb": XGBClassifier,
+    "lightgbm": LGBMClassifier,
+    "tabpfn": TabPFNClassifier,
+    "catboost": CatBoostClassifier,
+    "logreg": LogisticRegression,
+    "srf": RandomForestClassifier, 
+    "sgb": GradientBoostingClassifier
+}
+
+
+def build_model(name: Literal[*_MODEL_CONSTRUCTORS.keys()], params: Dict) -> object:
     """
     Creates classifier model
 
@@ -33,23 +35,10 @@ def build_model(name: Literal[*_MODEL_NAMES], params: Dict) -> object:
     Returns:
     - Initialized with `params` classifier model
     """
-    match (name):
-        case "xgb": 
-            return XGBClassifier(**params)
-        case "lightgbm": 
-            return LGBMClassifier(**params)
-        case "tabpfn": 
-            return TabPFNClassifier(**params)
-        case "catboost": 
-            return CatBoostClassifier(**params)
-        case "logreg": 
-            return LogisticRegression(**params)
-        case "srf": 
-            return RandomForestClassifier(**params)
-        case "sgb": 
-            return GradientBoostingClassifier(**params)
-        case _: 
-            raise ValueError(f"There is no '{name}' model")
+    model_class = _MODEL_CONSTRUCTORS.get(key=name, default=None)
+    assert model_class, f"There is no '{name}' model"
+    return model_class(**params)
+
 
 def get_proba(
     model,
@@ -60,7 +49,7 @@ def get_proba(
     """
     Returns model estimative probabilities of predicted targets
     """
-    assert model_name in _MODEL_NAMES, f"There is no '{model_name}' model"
+    assert model_name in _MODEL_CONSTRUCTORS, f"There is no '{model_name}' model"
 
     if model_name == "catboost":
         pool = Pool(data=X, cat_features=cat_features) if cat_features else Pool(X)
