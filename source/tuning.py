@@ -1,6 +1,5 @@
 import optuna
 import pandas as pd
-from catboost import Pool
 from typing import Dict, Literal, List, Callable
 from .models import build_model
 
@@ -53,7 +52,7 @@ def objective_factory(
         params = suggest_params(trial=trial, search_space=search_space)
         model = build_model(params)
 
-        
+
 
 
 
