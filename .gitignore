@@ -1,4 +1,14 @@
+# Virtual Environment
 venv/
-__pycache__/
+
+# Datasets
 data/
+
+# Cache 
+__pycache__/
 */catboost_info/
+*/mlruns/
+mlflow.db
+
+# Project Management
+TODO.md
