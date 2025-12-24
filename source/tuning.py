@@ -1,12 +1,13 @@
-from lightgbm import early_stopping
 import optuna
 import mlflow
+import numpy as np
 import pandas as pd
 from catboost import Pool
 from typing import Dict, Literal, List, Callable
 
-from .data import get_cv
-from .models import build_model, get_proba
+from data import get_cv
+from models import build_model, get_proba
+from metrics import optimize_threshold, evaluate_all
 
 
 def suggest_params(
@@ -36,7 +37,7 @@ def suggest_params(
             case "cat": 
                 params[key] = trial.suggest_categorical(
                     key, 
-                    spec["choises"]
+                    spec["choices"]
                 )
             case _: 
                 raise ValueError(f"There is no variable type'{t}'")
@@ -47,11 +48,12 @@ def suggest_params(
 def objective_factory(
     features: pd.DataFrame,
     targets: pd.DataFrame,
-    model_name: str | Literal["new_client", "old_client"],
+    cat_features: List | pd.Series | pd.Index,
+    model_name: str,
     search_space: Dict,
     cv_config: Dict,
-    cat_features: List | pd.Series | pd.Index,
-    optimize_metric: str
+    costs_config: Dict,
+    target_metric: str
 ) -> Callable:
     """Returns objective function for Optuna experiment running"""
     cv = get_cv(
@@ -71,13 +73,13 @@ def objective_factory(
 
             # Stratified cross-validation iterable
             cv_iterable = cv.split(features, targets)
-            for fold_idx, (train_idx, valid_idx) in enumerate(cv_iterable):
+            for train_idx, valid_idx in cv_iterable:
                 # Data split
                 X_train, X_valid = features.iloc[train_idx], features.iloc[valid_idx]
                 y_train, y_valid = targets.iloc[train_idx], features.iloc[valid_idx]
 
                 # Model building and fitting
-                model = build_model(params)
+                model = build_model(model_name, params)
                 if model_name == "catboost":
                     # CatBoost requires special data preparation and fitting steps
                     train_pool = Pool(X_train, y_train, cat_features=cat_features)
@@ -85,12 +87,13 @@ def objective_factory(
                     model.fit(
                         train_pool, 
                         eval_set=valid_pool, 
-                        early_stopping_rounds=search_space["early_stopping_rounds"],
+                        early_stopping_rounds=100,
                         verbose=False
                     )
                 else:
                     model.fit(X_train, y_train)
 
+                # Prediction logits
                 y_proba = get_proba(
                     model=model, 
                     features=X_valid, 
@@ -98,7 +101,43 @@ def objective_factory(
                     cat_features=cat_features 
                 )
 
+                # Looking for optimal threshold
+                optimal_threshold = optimize_threshold(
+                    y_true=y_valid,
+                    y_proba=y_proba,
+                    C_fp=costs_config["C_fp"],
+                    C_fn=costs_config["C_fn"]
+                )
+
+                # Calculate metrics using optimal threshold
+                metrics_record = evaluate_all(
+                    y_true=y_valid,
+                    y_proba=y_proba,
+                    threshold=optimal_threshold
+                )
+
+                metrics_folds.append(metrics_record)
 
 
+            # Aggregate metrics over whole cross-validation
+            # Calculating mean values for each metric
+            agg_metrics = {
+                k: float(
+                    np.mean([
+                        mf[k] for mf in metrics_folds
+                    ])
+                ) for k in metrics_folds[0].keys()
+            }
+
+            # Log metrics
+            mlflow.log_metrics({
+                f"{model_name}.{k}": v for k, v in agg_metrics.items()
+            })
+
+            # Saving aggregated metrics in trial instance
+            trial.set_user_attr("agg_metrics", agg_metrics)
+
+            # Optimizing (maximizing) target metric
+            return agg_metrics.get(target_metric, agg_metrics["pr_auc"])
 
     return objective

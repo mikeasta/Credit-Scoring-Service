@@ -22,7 +22,7 @@ def load_yaml_config(path: str | pathlib.Path) -> Dict:
 
 def get_train_data(
     client_type: str | Literal["new_client", "old_client"],
-    ohe: bool = True
+    ohe: bool = False
 ) -> Tuple[pd.DataFrame, pd.Series]:
     """
     Splits train data into features and targets

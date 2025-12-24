@@ -6,7 +6,7 @@ from tabpfn import TabPFNClassifier
 from catboost import CatBoostClassifier, Pool
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from .data import load_yaml_config
+from data import load_yaml_config
 
 
 _MODEL_CONSTRUCTORS = {
