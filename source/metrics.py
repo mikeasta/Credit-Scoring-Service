@@ -2,13 +2,6 @@ import pandas as pd
 from typing import List, Dict
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score, average_precision_score
 
-def accuracy(
-    y_true: pd.DataFrame | pd.Series | List[int],
-    y_pred: pd.DataFrame | pd.Series | List[int],
-) -> float:
-    """Calculates prediction accuracy"""
-    return sum(y_true == y_pred) / len(y_pred)
-
 
 def evaluate_all(
     y_true: pd.DataFrame | pd.Series | List[int],

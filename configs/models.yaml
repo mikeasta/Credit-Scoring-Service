@@ -9,6 +9,7 @@ catboost:
     border_count: {type: int, low: 64, high: 254}
     random_strength: {type: float, low: 1.0, high: 10.0}
     auto_class_weights: {type: cat, choices: ["Balanced", null]}
+    early_stopping_rounds: 100
 
 lightgbm:
   n_trials: 40

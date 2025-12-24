@@ -3,6 +3,7 @@ import logging
 from typing import Literal
 
 
+# TODO: Запуск экспериментов (Optuna.study)
 def run_study(
     client_type: str | Literal["new_client", "old_client"] = "new_client"
 ) -> None:

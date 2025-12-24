@@ -43,7 +43,7 @@ def build_model(name: Literal[*_MODEL_CONSTRUCTORS.keys()], params: Dict) -> obj
 
 def get_proba(
     model,
-    X: pd.DataFrame,
+    features: pd.DataFrame,
     model_name: str,
     cat_features: Iterable[str] = None
 ) -> pd.Series | List[float] :
@@ -53,10 +53,10 @@ def get_proba(
     assert model_name in _MODEL_CONSTRUCTORS, f"There is no '{model_name}' model"
 
     if model_name == "catboost":
-        pool = Pool(data=X, cat_features=cat_features) if cat_features else Pool(X)
+        pool = Pool(data=features, cat_features=cat_features) 
         return model.predict_proba(pool)[:, 1]
     else:
-        return model.predict_proba(X)[:, 1]
+        return model.predict_proba(features)[:, 1]
 
 
 def get_model_params(model_name: str) -> Dict:
