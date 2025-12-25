@@ -1,6 +1,8 @@
 import optuna
 import mlflow
 import logging
+import pathlib
+import joblib
 from typing import Literal
 
 from data import (
@@ -24,16 +26,32 @@ def run_study(
     cat_features = data_configs[client_type]["cat"]
 
     # Setting up MLFlow 
-    mlflow.set_tracking_uri(experiment_configs["logging"]["mlflow_uri"])
+    mlflow_uri = experiment_configs["logging"]["mlflow_uri"]
+    # Convert relative path to absolute path if it's a file URI
+    if mlflow_uri.startswith("file:"):
+        relative_path = mlflow_uri.replace("file:", "").lstrip("/")
+        # Get absolute path relative to the source directory
+        source_dir = pathlib.Path(__file__).parent
+        absolute_path = (source_dir / relative_path).resolve()
+        # Use proper file URI format (works on both Windows and Unix)
+        mlflow_uri = absolute_path.as_uri()
+    
+    mlflow.set_tracking_uri(mlflow_uri)
+    logging.info(f"MLflow tracking URI: {mlflow_uri}")
 
     # Create experiment if it doesn't exist, or get existing one
     experiment_name = experiment_configs["logging"]["mlflow_experiment"]
     try:
         experiment = mlflow.get_experiment_by_name(experiment_name)
         if experiment is None:
-            mlflow.create_experiment(experiment_name)
-    except Exception:
-        pass  # Experiment might already exist
+            experiment_id = mlflow.create_experiment(experiment_name)
+            logging.info(f"Created new experiment: {experiment_name} (ID: {experiment_id})")
+        else:
+            logging.info(f"Using existing experiment: {experiment_name} (ID: {experiment.experiment_id})")
+    except Exception as e:
+        logging.warning(f"Error checking/creating experiment: {e}")
+        # Try to set experiment anyway
+        pass
     
     mlflow.set_experiment(experiment_name)
     
@@ -65,7 +83,7 @@ def run_study(
 
             # Logging best hyperparams and metrics
             mlflow.log_params({f"{model_name}.best_params": study.best_params})
-            mlflow.log_metrics({f"{model_name}.best_{k}": v for k, v in best_metrics.items})
+            mlflow.log_metrics({f"{model_name}.best_{k}": v for k, v in best_metrics.items()})
 
             # Saving overall info
             results.append((model_name, best_metrics, study.best_params))
@@ -84,4 +102,5 @@ if __name__ == "__main__":
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
     mlflow.enable_system_metrics_logging()
-    run_study()
+    best_model_name, best_metrics, best_params = run_study()
+    joblib.dump(best_params, f"../artifacts/models/best_{best_model_name})_optuna.joblib")

@@ -1,9 +1,10 @@
 import optuna
 import mlflow
+import logging
 import numpy as np
 import pandas as pd
 from catboost import Pool
-from typing import Dict, Literal, List, Callable
+from typing import Dict, List, Callable
 
 from data import get_cv
 from models import build_model, get_proba
@@ -65,7 +66,10 @@ def objective_factory(
     def objective(trial: optuna.Trial):
         params = suggest_params(trial=trial, search_space=search_space)
 
-        with mlflow.start_run(nested=True):
+        with mlflow.start_run(
+            run_name=f"{model_name}.trial_{trial.number}",
+            nested=True
+        ):
             mlflow.log_params({f"{model_name}.{k}": v for k, v in params.items()})
             
             # All classification metrics over cross-validation
@@ -76,7 +80,7 @@ def objective_factory(
             for train_idx, valid_idx in cv_iterable:
                 # Data split
                 X_train, X_valid = features.iloc[train_idx], features.iloc[valid_idx]
-                y_train, y_valid = targets.iloc[train_idx], features.iloc[valid_idx]
+                y_train, y_valid = targets.iloc[train_idx], targets.iloc[valid_idx]
 
                 # Model building and fitting
                 model = build_model(model_name, params)
@@ -131,8 +135,8 @@ def objective_factory(
 
             # Log metrics
             mlflow.log_metrics({
-                f"{model_name}.{k}": v for k, v in agg_metrics.items()
-            })
+                f"{model_name}.{k}": v for k, v in agg_metrics.items()                
+            }, step=trial.number+1)
 
             # Saving aggregated metrics in trial instance
             trial.set_user_attr("agg_metrics", agg_metrics)

@@ -36,7 +36,7 @@ def build_model(name: Literal[*_MODEL_CONSTRUCTORS.keys()], params: Dict) -> obj
     Returns:
     - Initialized with `params` classifier model
     """
-    model_class = _MODEL_CONSTRUCTORS.get(key=name, default=None)
+    model_class = _MODEL_CONSTRUCTORS.get(name, None)
     assert model_class, f"There is no '{name}' model"
     return model_class(**params)
 

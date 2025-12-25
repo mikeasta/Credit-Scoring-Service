@@ -9,7 +9,7 @@ from sklearn.model_selection import StratifiedKFold
 
 def _load_data(path: str | pathlib.Path) -> pd.DataFrame:
     """Loads CSV data in DataFrame format from specific path"""
-    data = pd.read_csv(path)
+    data = pd.read_csv(path, index_col="id")
     return data
 
 
