@@ -1,6 +1,7 @@
-# Training
-training:
+# Runner
+runner:
   use_n_trials: false
+  logging_verbose: true
 
 # Cross-validation
 cv: 
