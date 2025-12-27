@@ -10,7 +10,7 @@ from data import load_yaml_config
 
 
 _MODEL_CONSTRUCTORS = {
-    "xgb": XGBClassifier,
+    "xgbboost": XGBClassifier,
     "lightgbm": LGBMClassifier,
     "tabpfn": TabPFNClassifier,
     "catboost": CatBoostClassifier,

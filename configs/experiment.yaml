@@ -1,3 +1,7 @@
+# Training
+training:
+  use_n_trials: false
+
 # Cross-validation
 cv: 
   n_splits: 5

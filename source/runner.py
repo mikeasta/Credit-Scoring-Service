@@ -75,7 +75,7 @@ def run_study(
             study = optuna.create_study(direction="maximize")
             study.optimize(
                 func=objective, 
-                n_trials=model_spec.get("n_trials", 40)
+                n_trials=model_spec.get("n_trials", 40) if experiment_configs["training"]["use_n_trials"] else 1
             )
 
             # Getting best metrics
