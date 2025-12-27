@@ -2,7 +2,6 @@ import pandas as pd
 from typing import Literal, Dict, Iterable, List
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
-from tabpfn import TabPFNClassifier
 from catboost import CatBoostClassifier, Pool
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -10,9 +9,8 @@ from data import load_yaml_config
 
 
 _MODEL_CONSTRUCTORS = {
-    "xgbboost": XGBClassifier,
+    "xgboost": XGBClassifier,
     "lightgbm": LGBMClassifier,
-    "tabpfn": TabPFNClassifier,
     "catboost": CatBoostClassifier,
     "logreg": LogisticRegression,
     "srf": RandomForestClassifier, 
@@ -27,7 +25,6 @@ def build_model(name: Literal[*_MODEL_CONSTRUCTORS.keys()], params: Dict) -> obj
     Supported models:
     - `xgb` - XGBoost classifier
     - `lightgbm` - LightGBM classifier
-    - `tabpfn` - TabPFN classifier (pre-trained neural network)
     - `catboost` - CatBoost classifier
     - `logreg` - Logistic Regression classifier
     - `srf` - Scikit-Learn Random Forest classifier

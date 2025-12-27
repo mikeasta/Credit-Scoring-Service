@@ -1,8 +1,9 @@
+import json
 import optuna
 import mlflow
+import joblib
 import logging
 import pathlib
-import joblib
 from typing import Literal
 
 from data import (
@@ -20,6 +21,18 @@ def run_study(
     data_configs = load_yaml_config("../configs/data.yaml")
     models_configs = load_yaml_config("../configs/models.yaml")
     experiment_configs = load_yaml_config("../configs/experiment.yaml")
+
+    # Logging verbose flag
+    verbose = experiment_configs["runner"]["logging_verbose"]
+
+    # Logging configuration
+    if verbose: 
+        logging.info("Data configuration:")
+        logging.info(json.dumps(data_configs, indent=4, sort_keys=True))
+        logging.info("Models configuration:")
+        logging.info(json.dumps(models_configs, indent=4, sort_keys=True))
+        logging.info("Experiment configuration:")
+        logging.info(json.dumps(experiment_configs, indent=4, sort_keys=True))
 
     # Load data
     features, targets = get_train_data(client_type=client_type)
@@ -75,7 +88,7 @@ def run_study(
             study = optuna.create_study(direction="maximize")
             study.optimize(
                 func=objective, 
-                n_trials=model_spec.get("n_trials", 40) if experiment_configs["training"]["use_n_trials"] else 1
+                n_trials=model_spec.get("n_trials", 40) if experiment_configs["runner"]["use_n_trials"] else 1
             )
 
             # Getting best metrics
@@ -91,16 +104,30 @@ def run_study(
     # Picking best model
     key = experiment_configs["metrics"]["optimize"]
     best = max(results, key=lambda x: x[1][key])
-    best_model_name, best_metrics, _ = best
+    best_model_name, best_metrics, best_params = best
     logging.info(f"Best model: {best_model_name}; {key}: {best_metrics[key]}")
-    return best
+
+    # Saving best model
+    joblib.dump(best_params, f"../artifacts/models/best_{best_model_name})_optuna.joblib")
 
 
-if __name__ == "__main__":
+def main(*args, **kwargs) -> None:
+    """
+    Main function for training experiments
+    """
+    # Pre-train setup
     logging.basicConfig(
         level=logging.INFO, 
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
     mlflow.enable_system_metrics_logging()
-    best_model_name, best_metrics, best_params = run_study()
-    joblib.dump(best_params, f"../artifacts/models/best_{best_model_name})_optuna.joblib")
+
+    # Running experiments
+    run_study()
+
+    # Post-train
+    logging.info("Experiment runner finished")    
+
+
+if __name__ == "__main__":
+    main()
