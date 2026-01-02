@@ -1,0 +1,3 @@
+classifier:
+  new_client_threshold: 0.09
+  old_client_threshold: 0.45

@@ -1,0 +1,26 @@
+# Runner
+runner:
+  use_n_trials: true
+
+# Cross-validation
+cv: 
+  n_splits: 5
+  shuffle: true
+  random_state: 42
+
+# Metrics
+metrics:
+  optimize: pr_auc # Key metric (for class imbalance)
+  report: [roc_auc, pr_auc, f1, recall, precision]
+
+# Costs of different errors
+costs:
+  C_fp: 1.0   # False positive (should be payable client)
+  C_fn: 10.0  # False negative (should be default client)
+
+# Logging settings
+logging:
+  mlflow_uri: "file:./mlruns"
+  mlflow_experiment: "credit_scoring"
+  verbose: true
+  descent_sort_report: true

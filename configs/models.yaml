@@ -1,0 +1,64 @@
+catboost:
+  n_trials: 40
+  search_space:
+    iterations: {type: "int", low: 400, high: 2000}
+    depth: {type: "int", low: 4, high: 8}
+    learning_rate: {type: "float", low: 0.02, high: 0.2, log: true}
+    l2_leaf_reg: {type: "float", low: 1.0, high: 15.0}
+    subsample: {type: "float", low: 0.6, high: 1.0}
+    border_count: {type: "int", low: 64, high: 254}
+    random_strength: {type: "float", low: 1.0, high: 10.0}
+    auto_class_weights: {type: "cat", choices: ["Balanced", null]}
+
+lightgbm:
+  n_trials: 40
+  search_space:
+    n_estimators: {type: "int", low: 100, high: 2000}
+    num_leaves: {type: "int", low: 16, high: 256}
+    learning_rate: {type: "float", low: 0.01, high: 0.2, log: true}
+    min_child_samples: {type: "int", low: 10, high: 100}
+    subsample: {type: "float", low: 0.6, high: 1.0}
+    colsample_bytree: {type: "float", low: 0.5, high: 1.0}
+    reg_alpha: {type: "float", low: 0.0, high: 10.0}
+    reg_lambda: {type: "float", low: 0.0, high: 10.0}
+    class_weight: {type: "cat", choices: ["balanced", null]}
+    verbose: {type: "cat", choices: [-1]}
+    objective: {type: "cat", choices: ["binary"]}
+    metric: {type: "cat", choices: ["binary_logLoss"]}
+    boosting_type: {type: "cat", choices: ["gbdt"]}
+
+xgboost:
+  n_trials: 40
+  search_space:
+    max_depth: {type: "int", low: 3, high: 8}
+    learning_rate: {type: "float", low: 0.01, high: 0.2, log: true}
+    subsample: {type: "float", low: 0.6, high: 1.0}
+    colsample_bytree: {type: "float", low: 0.5, high: 1.0}
+    reg_alpha: {type: "float", low: 0.0, high: 10.0}
+    reg_lambda: {type: "float", low: 0.0, high: 10.0}
+    scale_pos_weight: {type: "float", low: 1.0, high: 12.0, log: true}
+
+logreg:
+  n_trials: 20
+  search_space:
+    C: {type: "float", low: 0.01, high: 10.0, log: true}
+    penalty: {type: "cat", choices: ["l2"]}
+    class_weight: {type: "cat", choices: ["balanced", null]}
+
+srf:
+  n_trials: 40
+  search_space:
+    n_estimators: {type: "int", low: 10, high: 100}
+    max_depth: {type: "int", low: 5, high: 25}
+    criterion: {type: "cat", choices: ["gini", "entropy"]}
+    class_weight: {type: "cat", choices: ["balanced", "balanced_subsample", null]}
+
+sgb:
+  n_trials: 40
+  search_space:
+    loss: {type: "cat", choices: ["log_loss", "exponential"]}
+    learning_rate: {type: "float", low: 0.01, high: 0.2, log: true}
+    n_estimators: {type: "int", low: 10, high: 100}
+    subsample: {type: "float", low: 0.6, high: 1.0}
+    criterion: {type: "cat", choices: ["friedman_mse", "squared_error"]}
+    max_depth: {type: "int", low: 3, high: 10}

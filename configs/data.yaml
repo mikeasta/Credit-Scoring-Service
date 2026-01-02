@@ -1,0 +1,15 @@
+new_client:
+  features: ["age", "education", "income",
+   "has_car", "has_work", "has_passport"]
+  cat: ["education", "has_car", "has_work", "has_passport"]
+  target: "default"
+
+old_client:
+  features: ["age", "education", "income", "has_car", "car_is_foreign", "has_work",
+    "has_passport", "bki_score", "requests_count", "rejected_applications_count", 
+    "region_rating", "home_address_category", "work_address_category", 
+    "social_network_analysis_score", "first_record_age"]
+  cat: ["education", "has_car", "car_is_foreign", "has_work", "has_passport", 
+    "region_rating", "home_address_category", "work_address_category", 
+    "social_network_analysis_score", "first_record_age"]
+  target: "default"

@@ -1,0 +1,15 @@
+# Virtual Environment
+venv/
+
+# Environment variables
+.env
+
+# Datasets
+data/
+
+# Cache 
+__pycache__/
+.vscode/
+*/catboost_info/
+*/mlruns/
+mlflow.db
