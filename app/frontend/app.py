@@ -1,6 +1,13 @@
-import streamlit as st
+import os
 import requests
+import streamlit as st
 
+# Get backend url
+BACKEND_HOST = os.getenv("BACKEND_HOST")
+BACKEND_PORT = os.getenv("BACKEND_PORT")
+BACKEND_URL = f"http://{BACKEND_HOST}:{BACKEND_PORT}"
+
+# Draw frontend
 st.title("Кредитная карта Premium")
 st.write("Новая кредитная карта с мгновенным одобрением и ставкой под ___3% годовых!___")
 
@@ -40,8 +47,9 @@ if submit:
     }
 
     response = requests.post(
-        url="http://127.0.0.1:8000/score",
+        url=f"{BACKEND_URL}/score",
         json=data
     ).json()
 
     st.success(response["message"])
+    

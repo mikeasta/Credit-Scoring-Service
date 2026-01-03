@@ -23,9 +23,9 @@ def get_classifier(client_type: str | Literal["new_client", "old_client"]) -> An
     model_path = None
     match(client_type):
         case "new_client": 
-            model_path = Path("../artifacts/models/best_catboost_new_client_model_v1.cbm")
+            model_path = Path("./models/best_catboost_new_client_model_v1.cbm")
         case "old_client": 
-            model_path = Path("../artifacts/models/best_catboost_old_client_model_v1.cbm")
+            model_path = Path("./models/best_catboost_old_client_model_v1.cbm")
         case _: 
             raise Exception(f"There is no such a client type: {client_type}")
 
@@ -85,7 +85,7 @@ def predict_default(
 ):
     """Predicts client default"""
     # Load model thresholds
-    classifier_config = load_yaml_config("../configs/server.yaml")["classifier"]
+    classifier_config = load_yaml_config("server.yaml")["classifier"]
     threshold_type = "old_client_threshold" if client_present else "new_client_threshold"
     threshold = classifier_config[threshold_type]
     return (default_probability_estimation > threshold)
