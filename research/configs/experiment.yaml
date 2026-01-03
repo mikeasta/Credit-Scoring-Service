@@ -22,5 +22,3 @@ costs:
 logging:
   mlflow_uri: "file:./mlruns"
   mlflow_experiment: "credit_scoring"
-  verbose: true
-  descent_sort_report: true

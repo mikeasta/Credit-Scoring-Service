@@ -13,8 +13,8 @@ from data import (
 
 
 # Configuration paths
-_DATA_CONFIGS = Path("../configs/data.yaml")
-_MODELS_CONFIGS = Path("../configs/models.yaml")
+_DATA_CONFIGS       = Path("../configs/data.yaml")
+_MODELS_CONFIGS     = Path("../configs/models.yaml")
 _EXPERIMENT_CONFIGS = Path("../configs/experiment.yaml")
 
 
@@ -23,20 +23,15 @@ def run_study(
 ) -> pd.DataFrame:
     """Runs whole experiment tracking process"""
     # Import configs
-    data_configs = load_yaml_config(_DATA_CONFIGS)
-    models_configs = load_yaml_config(_MODELS_CONFIGS)
+    data_configs       = load_yaml_config(_DATA_CONFIGS)
+    models_configs     = load_yaml_config(_MODELS_CONFIGS)
     experiment_configs = load_yaml_config(_EXPERIMENT_CONFIGS)
 
-    # Logging verbose flag
-    verbose = experiment_configs["logging"]["verbose"]
-
-    # Logging configuration
-    if verbose: 
-        # Run start
-        logging.info(f"Started run for '{client_type}' type. Optimizing {experiment_configs["metrics"]["optimize"]} metric.")
-        logging.info(f"Data configuration: {str(_DATA_CONFIGS)}")
-        logging.info(f"Models configuration: {str(_MODELS_CONFIGS)}")
-        logging.info(f"Experiment configuration: {str(_EXPERIMENT_CONFIGS)}")
+    # Run start
+    logging.info(f"Started run for '{client_type}' type. Optimizing {experiment_configs["metrics"]["optimize"]} metric.")
+    logging.info(f"Data configuration: {str(_DATA_CONFIGS)}")
+    logging.info(f"Models configuration: {str(_MODELS_CONFIGS)}")
+    logging.info(f"Experiment configuration: {str(_EXPERIMENT_CONFIGS)}")
 
     # Load data
     features, targets = get_train_data(client_type=client_type)
@@ -142,7 +137,6 @@ def main(*args, **kwargs) -> None:
 
     # Load necessary configurations
     data_configs = load_yaml_config(_DATA_CONFIGS)
-    experiment_configs = load_yaml_config(_EXPERIMENT_CONFIGS)
 
     # Running experiments
     reports = []
@@ -154,10 +148,7 @@ def main(*args, **kwargs) -> None:
 
     # Logging 
     for client_type, report_df in zip(data_configs.keys(), reports):
-        # Should we sort report values
-        if experiment_configs["logging"]["descent_sort_report"]:
-            report_df = report_df.sort_values(by=report_df.columns[1], ascending=False)
-
+        report_df = report_df.sort_values(by=report_df.columns[1], ascending=False)
         logging.info(f"{client_type} experiment report:\n{report_df.to_string()}")
 
     # Post-train

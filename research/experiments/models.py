@@ -5,7 +5,6 @@ from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier, Pool
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from data import load_yaml_config
 
 
 _MODEL_CONSTRUCTORS = {
@@ -54,12 +53,3 @@ def get_proba(
         return model.predict_proba(pool)[:, 1]
     else:
         return model.predict_proba(features)[:, 1]
-
-
-def get_model_params(model_name: str) -> Dict:
-    """Loads and returns model parameters"""
-    models_config = load_yaml_config("../configs/models.yaml")
-    model_config = models_config.get(model_name, None)
-    assert model_config, f"There is no '{model_name}' model"
-
-    return model_config
