@@ -1,0 +1,23 @@
+# Base layer
+FROM python:3.12-slim
+
+# Meta
+LABEL maintainer="m.astashonak@gmail.com"
+
+# Disable cache files
+ENV PYTHONDONTWRITEBYTECODE=1 
+ENV PYTHONUNBUFFERED=1
+
+# Working directory
+WORKDIR /app
+COPY ../app/backend/ /app/backend
+
+# Install dependencies
+RUN pip install fastapi uvicorn[standart] pydantic \
+pandas catboost psycopg2-binary sqlalchemy pyyaml
+
+# Open port
+EXPOSE 8000
+
+# Start backend
+CMD ["uvicorn", "app:app", "--app-dir", "/app/backend", "--host", "0.0.0.0", "--port", "8000"]

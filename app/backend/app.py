@@ -146,4 +146,8 @@ def score(data: ClientData):
     )
 
     return { "message": message }
+
+@app.get("/greet")
+def greet():
+    return { "message": "Hello World!" }
     

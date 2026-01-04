@@ -3,21 +3,16 @@ import logging
 import sqlalchemy
 import pandas as pd
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Paths
 _TEST_DATASET_PATH = Path("../data/processed/test_dataset.csv")
-_ENVIRONMENT_VARIABLES_PATH = Path("../.env")
-
-# Load environment data
-load_dotenv(_ENVIRONMENT_VARIABLES_PATH)
 
 # Database connection credentials
-DB_NAME     = os.environ.get("DATABASE_NAME")
-DB_USER     = os.environ.get("DATABASE_USER")
-DB_PASSWORD = os.environ.get("DATABASE_PASSWORD")
-DB_HOST     = os.environ.get("DATABASE_HOST")
-DB_PORT     = os.environ.get("DATABASE_PORT")
+DB_NAME     = os.getenv("DATABASE_NAME")
+DB_USER     = os.getenv("DATABASE_USER")
+DB_PASSWORD = os.getenv("DATABASE_PASSWORD")
+DB_HOST     = os.getenv("DATABASE_HOST")
+DB_PORT     = os.getenv("DATABASE_PORT")
 
 DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
