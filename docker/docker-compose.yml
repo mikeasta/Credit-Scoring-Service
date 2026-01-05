@@ -1,0 +1,48 @@
+# Container Composing
+services:
+  database:
+    image: postgres:16
+    restart: always
+    container_name: credit_scoring_database 
+    environment:
+      - POSTGRES_DB=credit_scoring 
+      - POSTGRES_USER=postgres 
+      - POSTGRES_PASSWORD=123456 
+    volumes: 
+      - ../app/database/credit_scoring.sql:/docker-entrypoint-initdb.d/credit_scoring.sql
+      # - ../app/database/:/docker-entrypoint-initdb.d/
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5431:5432
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: credit_scoring_backend
+    environment:
+      - POSTGRES_DB=credit_scoring 
+      - POSTGRES_USER=postgres 
+      - POSTGRES_PASSWORD=123456 
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+    ports: 
+      - 8000:8000
+    depends_on:
+      - database
+
+  frontend: 
+    build: 
+      context: .. 
+      dockerfile: docker/Dockerfile.frontend 
+    container_name: credit_scoring_frontend 
+    environment:
+      - BACKEND_HOST=backend
+      - BACKEND_PORT=8000
+    ports: 
+      - 8501:8501
+    depends_on: 
+      - backend
+  
+volumes: 
+  pgdata:

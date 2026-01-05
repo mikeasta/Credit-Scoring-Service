@@ -46,10 +46,17 @@ if submit:
         "has_passport": int(has_passport),
     }
 
-    response = requests.post(
-        url=f"{BACKEND_URL}/score",
-        json=data
-    ).json()
-
-    st.success(response["message"])
+    try:
+        response = requests.post(
+            url=f"{BACKEND_URL}/score",
+            json=data,
+            timeout=10
+        )
+        response.raise_for_status()  # Raise an exception for bad status codes
+        result = response.json()
+        st.success(result["message"])
+    except requests.exceptions.RequestException as e:
+        st.error(f"Ошибка при подключении к серверу: {str(e)}")
+    except ValueError as e:
+        st.error(f"Ошибка при обработке ответа сервера: {str(e)}")
     

@@ -20,17 +20,19 @@ app = FastAPI()
 
 
 def get_classifier(client_type: str | Literal["new_client", "old_client"]) -> Any:
+    # Get path relative to this file's directory
+    base_dir = Path(__file__).parent
     model_path = None
     match(client_type):
         case "new_client": 
-            model_path = Path("./models/best_catboost_new_client_model_v1.cbm")
+            model_path = base_dir / "models" / "best_catboost_new_client_model_v1.cbm"
         case "old_client": 
-            model_path = Path("./models/best_catboost_old_client_model_v1.cbm")
+            model_path = base_dir / "models" / "best_catboost_old_client_model_v1.cbm"
         case _: 
             raise Exception(f"There is no such a client type: {client_type}")
 
     model = CatBoostClassifier()
-    model.load_model(model_path)
+    model.load_model(str(model_path))
     return model
 
 
@@ -85,7 +87,9 @@ def predict_default(
 ):
     """Predicts client default"""
     # Load model thresholds
-    classifier_config = load_yaml_config("server.yaml")["classifier"]
+    base_dir = Path(__file__).parent
+    config_path = base_dir / "server.yaml"
+    classifier_config = load_yaml_config(config_path)["classifier"]
     threshold_type = "old_client_threshold" if client_present else "new_client_threshold"
     threshold = classifier_config[threshold_type]
     return (default_probability_estimation > threshold)
@@ -122,7 +126,8 @@ def score(data: ClientData):
     client_data = get_record_by_name(data.name_surname)
    
     # Get prediction model
-    client_present = len(client_data) == 1
+    # client_data is always a DataFrame (empty if error or not found)
+    client_present = client_data is not None and len(client_data) == 1
     classifier = get_classifier(
         client_type="old_client" if client_present else "new_client"
     )
