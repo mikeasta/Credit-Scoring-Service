@@ -10,7 +10,6 @@ services:
       - POSTGRES_PASSWORD=123456 
     volumes: 
       - ../app/database/credit_scoring.sql:/docker-entrypoint-initdb.d/credit_scoring.sql
-      # - ../app/database/:/docker-entrypoint-initdb.d/
       - pgdata:/var/lib/postgresql/data
     ports:
       - 5431:5432
