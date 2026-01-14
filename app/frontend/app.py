@@ -11,6 +11,7 @@ BACKEND_URL = f"http://{BACKEND_HOST}:{BACKEND_PORT}"
 st.title("Кредитная карта Premium")
 st.write("Новая кредитная карта с мгновенным одобрением и ставкой под ___3% годовых!___")
 
+# For prettier UI and convenient UX
 education_types = [
     "Нет образования", 
     "Среднее", 
@@ -20,6 +21,7 @@ education_types = [
     "Аспирантура"
 ]
 
+# Client info form
 with st.form("Подать заявку"):
     name_surname = st.text_input("Ваше имя и фамилия")
     age = st.number_input("Ваш возраст", min_value=18)
@@ -35,7 +37,10 @@ with st.form("Подать заявку"):
     has_passport = st.checkbox("У вас есть заграничный паспорт?")
     submit = st.form_submit_button("Подать заявку")
 
+
+# Checks if submit button is pushed
 if submit:
+    # Form client data object
     data = {
         "name_surname": name_surname,
         "age": age,
@@ -47,12 +52,17 @@ if submit:
     }
 
     try:
+        # Sends client data and gets scoring system result
         response = requests.post(
             url=f"{BACKEND_URL}/score",
             json=data,
             timeout=10
         )
-        response.raise_for_status()  # Raise an exception for bad status codes
+
+        # Raise an exception for bad status codes
+        response.raise_for_status()
+
+        # Show result
         result = response.json()
         st.success(result["message"])
     except requests.exceptions.RequestException as e:

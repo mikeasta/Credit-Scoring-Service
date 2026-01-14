@@ -1,7 +1,7 @@
 # Container Composing
 services:
   database:
-    image: postgres:16
+    image: postgres:16-alpine
     restart: always
     container_name: credit_scoring_database 
     environment:
