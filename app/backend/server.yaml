@@ -1,3 +1,7 @@
 classifier:
   new_client_threshold: 0.09
   old_client_threshold: 0.45
+
+paths:
+  new_client: "best_catboost_new_client_model_v1.cbm"
+  old_client: "best_catboost_old_client_model_v1.cbm"
